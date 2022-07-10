@@ -27,6 +27,11 @@ public class Contact extends AbstractEntity {
     @ManyToOne
     private Status status;
 
+    @NotNull
+    @ManyToOne
+    private Department department;
+
+
     @Email
     @NotEmpty
     private String email = "";
@@ -74,5 +79,13 @@ public class Contact extends AbstractEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

@@ -2,9 +2,11 @@ package com.example.application.data.generator;
 
 import com.example.application.data.entity.Company;
 import com.example.application.data.entity.Contact;
+import com.example.application.data.entity.Department;
 import com.example.application.data.entity.Status;
 import com.example.application.data.repository.CompanyRepository;
 import com.example.application.data.repository.ContactRepository;
+import com.example.application.data.repository.DepartmentRepository;
 import com.example.application.data.repository.StatusRepository;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
@@ -24,7 +26,8 @@ public class DataGenerator {
 
     @Bean
     public CommandLineRunner loadData(ContactRepository contactRepository, CompanyRepository companyRepository,
-            StatusRepository statusRepository) {
+                                      StatusRepository statusRepository,
+                                      DepartmentRepository departmentRepository) {
 
         return args -> {
             Logger logger = LoggerFactory.getLogger(getClass());
@@ -37,12 +40,17 @@ public class DataGenerator {
             logger.info("Generating demo data");
             ExampleDataGenerator<Company> companyGenerator = new ExampleDataGenerator<>(Company.class,
                     LocalDateTime.now());
-            companyGenerator.setData(Company::setName, DataType.COMPANY_NAME);
+            companyGenerator.setData(Company::setName, DataType.ADDRESS);
             List<Company> companies = companyRepository.saveAll(companyGenerator.create(5, seed));
 
             List<Status> statuses = statusRepository
-                    .saveAll(Stream.of("Imported lead", "Not contacted", "Contacted", "Customer", "Closed (lost)")
+                    .saveAll(Stream.of("Technical lead", "Manager", "Developer", "Team leader", "Application support")
                             .map(Status::new).collect(Collectors.toList()));
+
+
+            List<Department> departments = departmentRepository.saveAll(Stream.of("IT Support", "Operations", "IT", "Administration", "IT Helpdesk")
+                    .map(Department::new).collect(Collectors.toList()));
+
 
             logger.info("... generating 50 Contact entities...");
             ExampleDataGenerator<Contact> contactGenerator = new ExampleDataGenerator<>(Contact.class,
@@ -55,6 +63,7 @@ public class DataGenerator {
             List<Contact> contacts = contactGenerator.create(50, seed).stream().map(contact -> {
                 contact.setCompany(companies.get(r.nextInt(companies.size())));
                 contact.setStatus(statuses.get(r.nextInt(statuses.size())));
+                contact.setDepartment(departments.get(r.nextInt(departments.size())));
                 return contact;
             }).collect(Collectors.toList());
 
